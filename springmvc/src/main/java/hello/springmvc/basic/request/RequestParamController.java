@@ -4,9 +4,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.io.IOException;
+import java.util.Map;
 
 //자동으로 log라는 Logger 객체를 만들어주는 것
 @Slf4j
@@ -24,5 +28,76 @@ public class RequestParamController {
         log.info("username = {}, age = {}", username, age);
 
         response.getWriter().write("ok");
+    }
+
+    // @ResponseBody : ok라는 문자를 http 문자에 넣어서 반환함
+    // 즉, controller에 의해 jsp 파일을 찾지 않음
+    @ResponseBody
+    @RequestMapping("/request-param-v2")
+    public String requestParamV2(
+            @RequestParam("username") String memberName,
+            @RequestParam("age") int memberAge){
+        log.info("username = {}, age = {}", memberName, memberAge);
+        return "ok";
+    }
+
+    @ResponseBody
+    @RequestMapping("/request-param-v3")
+    public String requestParamV3(
+            //@RequestParam() 괄호생략가능
+            // 근데 괄호안의 요청파라미터와 뒤의 변수명이 같아야 함
+            @RequestParam String username,
+            @RequestParam int age){
+        log.info("username = {}, age = {}", username, age);
+        return "ok";
+    }
+
+    @ResponseBody
+    @RequestMapping("/request-param-v4")
+    public String requestParamV4(String username, int age){
+        //애노테이션도 없앨 수 있음
+        //단, 요청파라미터와 뒤의 변수명이 같아야 함
+        log.info("username = {}, age = {}", username, age);
+        return "ok";
+    }
+
+    @ResponseBody
+    @RequestMapping("/request-param-required")
+    public String requestParamRequired(
+            // required = true : 파라미터가 꼭 들어와야함 없으면 오류남
+            // required = false : 파라미터가 꼭 없어도됨
+            @RequestParam(required = true) String username,
+            @RequestParam(required = false) Integer age)
+            // 근데 만약 age에 아무것도 안쓰인다면 null이 들어오는데
+            // int형은 null이 없으니까 에러가남
+            // 따라서 Integer를 써줘야함
+            // username이 true일때, 빈문자를 넣으면 통과됨 -> 이거 조심해야함
+    {
+        log.info("username = {}, age = {}", username, age);
+        return "ok";
+    }
+
+
+
+    @ResponseBody
+    @RequestMapping("/request-param-default")
+    public String requestParamDefault(
+            @RequestParam(required = true, defaultValue = "guest") String username,
+            @RequestParam(required = false, defaultValue = "-1") int age)
+    {
+        log.info("username = {}, age = {}", username, age);
+        return "ok";
+    }
+
+
+
+    @ResponseBody
+    @RequestMapping("/request-param-map")
+    public String requestParamMap(@RequestParam Map<String, Object> paramMap)
+    {
+        log.info("username = {}, age = {}",
+                paramMap.get("username"),
+                paramMap.get("age"));
+        return "ok";
     }
 }
