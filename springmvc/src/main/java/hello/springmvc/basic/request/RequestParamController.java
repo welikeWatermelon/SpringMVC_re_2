@@ -82,6 +82,8 @@ public class RequestParamController {
     @ResponseBody
     @RequestMapping("/request-param-default")
     public String requestParamDefault(
+            // defaultValue가 있으면 사실 required가 필요없음
+            // 파라미터에 값이 없는 경우 기본 값을 넣어줌
             @RequestParam(required = true, defaultValue = "guest") String username,
             @RequestParam(required = false, defaultValue = "-1") int age)
     {
